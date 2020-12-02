@@ -1,0 +1,2 @@
+day 01: target two-sum product is 980499
+day 01: target three-sum product is 200637446
