@@ -1,6 +1,6 @@
 [package]
-name = "run-all"
-version = "0.1.0"
+name = "day-02"
+version = "0.0.0"
 authors = ["Vlad Stepanov <8uk.8ak@gmail.com>"]
 edition = "2018"
 
@@ -9,5 +9,5 @@ edition = "2018"
 [dependencies]
 advent-utils = { git = "https://github.com/utter-step/advent-utils" }
 
-day-01 = { path = "../day-01" }
-day-02 = { path = "../day-02" }
+displaydoc = "0.1"
+thiserror = "1"

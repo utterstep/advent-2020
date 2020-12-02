@@ -4,6 +4,7 @@ use advent_utils::{parse_file, Part, Solver};
 
 const TARGET_SUM: u32 = 2020;
 
+#[derive(Debug)]
 pub struct Solution {
     expenses: BTreeSet<u32>,
 }
