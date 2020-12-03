@@ -2,3 +2,5 @@ day 01: target two-sum product is 980499
 day 01: target three-sum product is 200637446
 day 02: there are 422 valid passwords (using letters count)
 day 02: there are 451 valid passwords (using positional method)
+day 03: you will encounter 209 trees
+day 03: encounters count from all routes multiplied: 1574890240

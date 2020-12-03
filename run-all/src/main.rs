@@ -20,6 +20,7 @@ fn run<S: Solver>() -> Result<(), Box<dyn Error>> {
 fn main() -> Result<(), Box<dyn Error>> {
     run::<day_01::Solution>()?;
     run::<day_02::Solution>()?;
+    run::<day_03::Solution>()?;
 
     Ok(())
 }
