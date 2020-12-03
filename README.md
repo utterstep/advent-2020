@@ -1,5 +1,7 @@
 # advent-2020
 
+[![GitHub Actions Badge](https://github.com/utter-step/advent-2020/workflows/CI/badge.svg)](https://github.com/utter-step/advent-2020/actions?query=workflow%3ACI)
+
 Rusty Advent of Code solutions — 2020
 
 ```(bash)
