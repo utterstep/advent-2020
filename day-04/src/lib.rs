@@ -37,10 +37,7 @@ impl Solver for Solution {
             ),
             Part::Two => format!(
                 "{} passports are valid",
-                self.passports
-                    .iter()
-                    .filter(|p| p.is_valid())
-                    .count()
+                self.passports.iter().filter(|p| p.is_valid()).count()
             ),
         }
     }
