@@ -15,7 +15,6 @@ impl FromStr for BoardingPass {
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let row =
             s.chars()
-                .clone()
                 .take(7)
                 .enumerate()
                 .try_fold(0u32, |acc, (idx, chr)| match chr {
