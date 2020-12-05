@@ -29,16 +29,17 @@ impl Solver for Solution {
     fn solve(&self, part: Part) -> String {
         let ids = self.passes.iter().map(BoardingPass::id).collect::<Vec<_>>();
 
-        let max_id = ids.iter().max().expect("no passes provided");
-
         match part {
             Part::One => {
+                let max_id = *ids.iter().max().expect("no passes provided");
+
                 format!("max ID is {}", max_id)
             }
             Part::Two => {
-                let min_id = ids.iter().min().expect("no passes provided");
+                let max_id = *ids.iter().max().expect("no passes provided");
+                let min_id = *ids.iter().min().expect("no passes provided");
 
-                let expected_sum = sum_up_to_n(*max_id) - sum_up_to_n(*min_id - 1);
+                let expected_sum = sum_up_to_n(max_id) - sum_up_to_n(min_id - 1);
                 let real_sum = ids.iter().sum::<u32>();
 
                 format!("missing pass ID is {}", expected_sum - real_sum)
