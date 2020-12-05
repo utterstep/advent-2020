@@ -33,7 +33,6 @@ impl Solver for Solution {
                 self.passports
                     .iter()
                     .filter(|p| p.contains_required_fields())
-                    .inspect(|p| println!("{:#?}", p))
                     .count()
             ),
             Part::Two => format!(
@@ -41,7 +40,6 @@ impl Solver for Solution {
                 self.passports
                     .iter()
                     .filter(|p| p.is_valid())
-                    .inspect(|p| println!("{:#?}", p))
                     .count()
             ),
         }

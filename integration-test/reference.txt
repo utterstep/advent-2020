@@ -4,3 +4,7 @@ day 02: there are 422 valid passwords (using letters count)
 day 02: there are 451 valid passwords (using positional method)
 day 03: you will encounter 209 trees
 day 03: encounters count from all routes multiplied: 1574890240
+day 04: 242 passports contains required fields
+day 04: 186 passports are valid
+day 05: max ID is 944
+day 05: missing pass ID is 554

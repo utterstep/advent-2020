@@ -25,8 +25,7 @@ impl FromStr for BoardingPass {
                 })?;
 
         let seat =
-            s.chars()
-                .skip(7)
+            s[7..].chars()
                 .take(3)
                 .enumerate()
                 .try_fold(0u32, |acc, (idx, chr)| match chr {
