@@ -8,36 +8,31 @@ use passport::Passport;
 
 #[derive(Debug)]
 pub struct Solution {
-    passports: Vec<Passport>,
+    passports_raw: String,
 }
 
 impl TryFrom<String> for Solution {
     type Error = Box<dyn Error>;
 
     fn try_from(value: String) -> Result<Self, Self::Error> {
-        let passports = read_file(value)?
-            .split("\n\n")
-            .map(str::parse)
-            .map(Result::unwrap)
-            .collect();
+        let passports_raw = read_file(value)?;
 
-        Ok(Self { passports })
+        Ok(Self { passports_raw })
     }
 }
 
 impl Solver for Solution {
     fn solve(&self, part: Part) -> String {
+        let passports = self.passports_raw.split("\n\n").map(Passport::new);
+
         match part {
             Part::One => format!(
                 "{} passports contains required fields",
-                self.passports
-                    .iter()
-                    .filter(|p| p.contains_required_fields())
-                    .count()
+                passports.filter(|p| p.contains_required_fields()).count()
             ),
             Part::Two => format!(
                 "{} passports are valid",
-                self.passports.iter().filter(|p| p.is_valid()).count()
+                passports.filter(|p| p.is_valid()).count()
             ),
         }
     }

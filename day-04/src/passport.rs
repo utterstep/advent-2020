@@ -1,31 +1,27 @@
-use std::{collections::BTreeMap, str::FromStr};
+use std::collections::BTreeMap;
 
 #[derive(Debug)]
-pub(crate) struct Passport(BTreeMap<String, String>);
+pub(crate) struct Passport<'a>(BTreeMap<&'a str, &'a str>);
 
-impl FromStr for Passport {
-    type Err = ();
+const REQUIRED_FIELDS: [&str; 7] = ["byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid"];
 
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
+impl<'a> Passport<'a> {
+    pub(crate) fn new(raw_data: &'a str) -> Self {
         let mut map = BTreeMap::new();
 
-        s.split(|c| c == ' ' || c == '\n').for_each(|field| {
+        raw_data.split(|c| c == ' ' || c == '\n').for_each(|field| {
             let mut data = field.split(':');
 
             if let Some(key) = data.next() {
                 if let Some(value) = data.next() {
-                    map.insert(key.trim().to_owned(), value.trim().to_owned());
+                    map.insert(key.trim(), value.trim());
                 }
             }
         });
 
-        Ok(Self(map))
+        Self(map)
     }
-}
 
-const REQUIRED_FIELDS: [&str; 7] = ["byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid"];
-
-impl Passport {
     pub(crate) fn contains_required_fields(&self) -> bool {
         REQUIRED_FIELDS
             .iter()
@@ -33,91 +29,75 @@ impl Passport {
     }
 
     pub(crate) fn is_valid(&self) -> bool {
-        if !self.contains_required_fields() {
-            return false;
+        self._is_valid().unwrap_or(false)
+    }
+
+    fn _is_valid(&self) -> Option<bool> {
+        let byr = self.0.get("byr")?.parse::<u32>().ok()?;
+
+        if !(byr >= 1920 && byr <= 2002) {
+            return Some(false);
         }
 
-        let byr = self.0.get("byr").unwrap().parse::<u32>();
+        let iyr = self.0.get("iyr")?.parse::<u32>().ok()?;
 
-        if let Ok(byr) = byr {
-            if !(byr >= 1920 && byr <= 2002) {
-                return false;
-            }
-        } else {
-            return false;
+        if !(iyr >= 2010 && iyr <= 2020) {
+            return Some(false);
         }
 
-        let iyr = self.0.get("iyr").unwrap().parse::<u32>();
+        let eyr = self.0.get("eyr")?.parse::<u32>().ok()?;
 
-        if let Ok(iyr) = iyr {
-            if !(iyr >= 2010 && iyr <= 2020) {
-                return false;
-            }
-        } else {
-            return false;
+        if !(eyr >= 2010 && eyr <= 2030) {
+            return Some(false);
         }
 
-        let eyr = self.0.get("eyr").unwrap().parse::<u32>();
-
-        if let Ok(eyr) = eyr {
-            if !(eyr >= 2010 && eyr <= 2030) {
-                return false;
-            }
-        } else {
-            return false;
-        }
-
-        let hgt = self.0.get("hgt").unwrap();
+        let hgt = self.0.get("hgt")?;
 
         if hgt.ends_with("cm") {
-            if let Ok(hgt) = hgt.split_at(hgt.len() - 2).0.parse::<u32>() {
-                if !(hgt >= 150 && hgt <= 193) {
-                    return false;
-                }
+            let hgt = hgt.split_at(hgt.len() - 2).0.parse::<u32>().ok()?;
+
+            if !(hgt >= 150 && hgt <= 193) {
+                return Some(false);
             }
         } else if hgt.ends_with("in") {
-            if let Ok(hgt) = hgt.split_at(hgt.len() - 2).0.parse::<u32>() {
-                if !(hgt >= 59 && hgt <= 76) {
-                    return false;
-                }
+            let hgt = hgt.split_at(hgt.len() - 2).0.parse::<u32>().ok()?;
+
+            if !(hgt >= 59 && hgt <= 76) {
+                return Some(false);
             }
         } else {
-            return false;
+            return Some(false);
         }
 
-        let hcl = self.0.get("hcl").unwrap();
+        let hcl = self.0.get("hcl")?;
 
         if !hcl.starts_with('#') {
-            return false;
+            return Some(false);
         }
 
         if hcl[1..].len() != 6 {
-            return false;
+            return Some(false);
         }
 
-        if u32::from_str_radix(hcl[1..].as_ref(), 16).is_err() {
-            return false;
-        }
+        u32::from_str_radix(hcl[1..].as_ref(), 16).ok()?;
 
-        let ecl = self.0.get("ecl").unwrap();
+        let ecl = self.0.get("ecl")?;
 
         const EYE_COLLORS: [&str; 7] = ["amb", "blu", "brn", "gry", "grn", "hzl", "oth"];
 
-        if !EYE_COLLORS.contains(&ecl.as_ref()) {
-            return false;
+        if !EYE_COLLORS.contains(ecl) {
+            return Some(false);
         }
 
-        let pid = self.0.get("pid").unwrap();
+        let pid = self.0.get("pid")?;
 
         if pid.len() != 9 {
-            return false;
+            return Some(false);
         }
 
-        if pid.parse::<u32>().is_err() {
-            return false;
-        }
+        pid.parse::<u32>().ok()?;
 
-        true
+        Some(true)
     }
 }
 
@@ -144,8 +124,7 @@ mod tests {
         assert_eq!(
             passports
                 .split("\n\n")
-                .map(str::parse::<Passport>)
-                .map(Result::unwrap)
+                .map(Passport::new)
                 .map(|p| p.contains_required_fields())
                 .collect::<Vec<_>>(),
             vec![true, false, true, false],
@@ -170,8 +149,7 @@ mod tests {
 
         assert!(invalid_passports
             .split("\n\n")
-            .map(str::parse::<Passport>)
-            .map(Result::unwrap)
+            .map(Passport::new)
             .all(|p| !p.is_valid()));
 
         let valid_passports = "pid:087499704 hgt:74in ecl:grn iyr:2012 eyr:2030 byr:1980
@@ -189,8 +167,7 @@ mod tests {
 
         assert!(valid_passports
             .split("\n\n")
-            .map(str::parse::<Passport>)
-            .map(Result::unwrap)
+            .map(Passport::new)
             .all(|p| p.is_valid()));
     }
 }

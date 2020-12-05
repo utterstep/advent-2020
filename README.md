@@ -7,8 +7,8 @@ Rusty Advent of Code solutions — 2020
 ```(bash)
 utterstep@utterstep-nix:~/my/advent-2020$ hyperfine --warmup 50 ./target/release/run-all
 Benchmark #1: ./target/release/run-all
-  Time (mean ± σ):       1.5 ms ±   0.0 ms    [User: 1.4 ms, System: 0.2 ms]
-  Range (min … max):     1.4 ms …   1.9 ms    1495 runs
+  Time (mean ± σ):       1.3 ms ±   0.0 ms    [User: 1.2 ms, System: 0.1 ms]
+  Range (min … max):     1.3 ms …   1.9 ms    1736 runs
 
   Warning: Command took less than 5 ms to complete. Results might be inaccurate.
 ```
