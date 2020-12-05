@@ -1,4 +1,4 @@
-use std::{convert::TryFrom, error::Error};
+use std::{convert::TryFrom, error::Error, path::PathBuf};
 
 use advent_utils::{parse_file, Part, Solver};
 
@@ -11,10 +11,10 @@ pub struct Solution {
     passes: Vec<BoardingPass>,
 }
 
-impl TryFrom<String> for Solution {
+impl TryFrom<PathBuf> for Solution {
     type Error = Box<dyn Error>;
 
-    fn try_from(path: String) -> Result<Self, Self::Error> {
+    fn try_from(path: PathBuf) -> Result<Self, Self::Error> {
         let passes = parse_file(path)?;
 
         Ok(Self { passes })

@@ -1,4 +1,4 @@
-use std::{collections::BTreeSet, convert::TryFrom, error::Error};
+use std::{collections::BTreeSet, convert::TryFrom, error::Error, path::PathBuf};
 
 use advent_utils::{parse_file, Part, Solver};
 
@@ -9,10 +9,10 @@ pub struct Solution {
     expenses: BTreeSet<u32>,
 }
 
-impl TryFrom<String> for Solution {
+impl TryFrom<PathBuf> for Solution {
     type Error = Box<dyn Error>;
 
-    fn try_from(input_file: String) -> Result<Self, Self::Error> {
+    fn try_from(input_file: PathBuf) -> Result<Self, Self::Error> {
         let expenses = parse_file(input_file)?;
 
         Ok(Self {

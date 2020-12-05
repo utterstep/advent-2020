@@ -1,4 +1,4 @@
-use std::{convert::TryFrom, error::Error};
+use std::{convert::TryFrom, error::Error, path::PathBuf};
 
 use advent_utils::{read_file, Part, Solver};
 
@@ -11,11 +11,11 @@ pub struct Solution {
     map: Map,
 }
 
-impl TryFrom<String> for Solution {
+impl TryFrom<PathBuf> for Solution {
     type Error = Box<dyn Error>;
 
-    fn try_from(value: String) -> Result<Self, Self::Error> {
-        let map = read_file(value)?.parse()?;
+    fn try_from(input_file: PathBuf) -> Result<Self, Self::Error> {
+        let map = read_file(input_file)?.parse()?;
 
         Ok(Self { map })
     }
