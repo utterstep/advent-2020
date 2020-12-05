@@ -13,15 +13,15 @@ impl FromStr for BoardingPass {
     type Err = UnknownFormatError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let row =
-            s.chars()
-                .take(7)
-                .enumerate()
-                .try_fold(0u32, |acc, (idx, chr)| match chr {
-                    'F' => Ok(acc),
-                    'B' => Ok(acc | 1 << (6 - idx)),
-                    _ => Err(UnknownFormatError),
-                })?;
+        let row = s
+            .chars()
+            .take(7)
+            .enumerate()
+            .try_fold(0u32, |acc, (idx, chr)| match chr {
+                'F' => Ok(acc),
+                'B' => Ok(acc | 1 << (6 - idx)),
+                _ => Err(UnknownFormatError),
+            })?;
 
         let seat =
             s[7..]
