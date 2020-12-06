@@ -4,11 +4,23 @@
 
 Rusty Advent of Code solutions — 2020
 
-```(bash)
+```console
+utterstep@utterstep-nix:~/my/advent-2020$ head /proc/cpuinfo
+processor   : 0
+vendor_id   : GenuineIntel
+cpu family  : 6
+model       : 158
+model name  : Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz
+stepping    : 10
+microcod    : 0xde
+cpu MHz     : 800.039
+cache size  : 9216 KB
+physical id : 0
+
 utterstep@utterstep-nix:~/my/advent-2020$ hyperfine --warmup 50 ./target/release/run-all
 Benchmark #1: ./target/release/run-all
-  Time (mean ± σ):       1.3 ms ±   0.0 ms    [User: 1.2 ms, System: 0.1 ms]
-  Range (min … max):     1.3 ms …   1.9 ms    1736 runs
+  Time (mean ± σ):       1.5 ms ±   0.0 ms    [User: 1.4 ms, System: 0.1 ms]
+  Range (min … max):     1.5 ms …   1.7 ms    1521 runs
 
   Warning: Command took less than 5 ms to complete. Results might be inaccurate.
 ```

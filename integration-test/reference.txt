@@ -8,3 +8,5 @@ day 04: 242 passports contains required fields
 day 04: 186 passports are valid
 day 05: max ID is 944
 day 05: missing pass ID is 554
+day 06: sum of 'yes' counts in all groups (ANY): 6885
+day 06: sum of 'yes' counts in all groups (ALL): 3550
