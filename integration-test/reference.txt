@@ -12,3 +12,5 @@ day 06: sum of 'yes' counts in all groups (ANY): 6885
 day 06: sum of 'yes' counts in all groups (ALL): 3550
 day 07: there are 148 possible containers for shiny gold bag
 day 07: shiny gold bag must contain 24867 other bags
+day 08: accumulator state before entering infinite loop: 2014
+day 08: vm halted with accumulator state 2251

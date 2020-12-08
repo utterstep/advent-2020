@@ -1,9 +1,6 @@
 use fxhash::{FxHashMap, FxHashSet};
 
-use std::{
-    convert::TryFrom,
-    iter::FromIterator,
-};
+use std::{convert::TryFrom, iter::FromIterator};
 
 use displaydoc::Display;
 use thiserror::Error;
