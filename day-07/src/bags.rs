@@ -1,5 +1,6 @@
+use fxhash::{FxHashMap, FxHashSet};
+
 use std::{
-    collections::{HashMap, HashSet},
     convert::TryFrom,
     iter::FromIterator,
 };
@@ -73,11 +74,11 @@ struct GraphNode<'a> {
 }
 
 #[derive(Debug)]
-pub(crate) struct RestrictionsGraph<'a>(HashMap<&'a str, GraphNode<'a>>);
+pub(crate) struct RestrictionsGraph<'a>(FxHashMap<&'a str, GraphNode<'a>>);
 
 impl<'a> FromIterator<BagsRestriction<'a>> for RestrictionsGraph<'a> {
     fn from_iter<T: IntoIterator<Item = BagsRestriction<'a>>>(iter: T) -> Self {
-        let mut map: HashMap<_, GraphNode<'a>> = HashMap::new();
+        let mut map: FxHashMap<_, GraphNode<'a>> = FxHashMap::default();
 
         for restriction in iter {
             {
@@ -102,7 +103,7 @@ impl<'a> FromIterator<BagsRestriction<'a>> for RestrictionsGraph<'a> {
 impl<'a> RestrictionsGraph<'a> {
     pub(crate) fn count_possible_containers(&self, color: &str) -> usize {
         let mut lookup_stack = vec![color];
-        let mut used_containers = HashSet::new();
+        let mut used_containers = FxHashSet::default();
 
         while let Some(container) = lookup_stack.pop() {
             used_containers.insert(container);

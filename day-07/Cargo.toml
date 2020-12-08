@@ -12,5 +12,7 @@ advent-utils = { git = "https://github.com/utter-step/advent-utils" }
 displaydoc = "0.1"
 thiserror = "1"
 
+fxhash = "0.2"
+
 [dev-dependencies]
 indoc = "1"
