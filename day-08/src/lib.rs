@@ -39,7 +39,7 @@ impl Solver for Solution {
                 )
             }
             Part::Two => {
-                let mut interesting_instructions = vm
+                let mut instructions_to_flip = vm
                     .instructions()
                     .iter()
                     .enumerate()
@@ -71,7 +71,7 @@ impl Solver for Solution {
 
                     vm.reset();
 
-                    let idx = interesting_instructions
+                    let idx = instructions_to_flip
                         .next()
                         .expect("unable to make required change");
                     flip_operation(&mut vm, idx);
