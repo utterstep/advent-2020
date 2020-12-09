@@ -24,18 +24,15 @@ impl Xmas {
         }
 
         for (i, num) in self.data[window_size..].iter().enumerate() {
-            let pair_num = nums
-                .iter()
-                .find(|&&&first_part| {
-                    if let Some(second_part) = num.checked_sub(first_part) {
-                        nums.contains(&second_part)
-                    } else {
-                        false
-                    }
-                });
+            let pair_num = nums.iter().find(|&&&first_part| {
+                if let Some(second_part) = num.checked_sub(first_part) {
+                    nums.contains(&second_part)
+                } else {
+                    false
+                }
+            });
 
-            if pair_num.is_none()
-            {
+            if pair_num.is_none() {
                 return Some((*num, i + window_size));
             }
 
