@@ -24,7 +24,7 @@ impl Xmas {
         }
 
         for (i, num) in self.data[window_size..].iter().enumerate() {
-            if nums
+            let pair_num = nums
                 .iter()
                 .find(|&&&first_part| {
                     if let Some(second_part) = num.checked_sub(first_part) {
@@ -32,8 +32,9 @@ impl Xmas {
                     } else {
                         false
                     }
-                })
-                .is_none()
+                });
+
+            if pair_num.is_none()
             {
                 return Some((*num, i + window_size));
             }
