@@ -1,10 +1,12 @@
-use std::collections::{BTreeMap, BTreeSet};
+use std::collections::BTreeSet;
+
+use fxhash::FxHashMap;
 
 #[derive(Debug, Clone)]
 pub(crate) struct Jolts {
     jolts: BTreeSet<u32>,
     max: u32,
-    cache: BTreeMap<u32, u64>,
+    cache: FxHashMap<u32, u64>,
 }
 
 impl From<Vec<u32>> for Jolts {
