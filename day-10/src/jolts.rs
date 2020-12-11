@@ -6,7 +6,7 @@ use fxhash::FxHashMap;
 pub(crate) struct Jolts {
     jolts: BTreeSet<u32>,
     max: u32,
-    cache: FxHashMap<u32, u64>,
+    paths: FxHashMap<u32, u64>,
 }
 
 impl From<Vec<u32>> for Jolts {
@@ -19,7 +19,7 @@ impl From<Vec<u32>> for Jolts {
         Self {
             jolts,
             max,
-            cache: Default::default(),
+            paths: Default::default(),
         }
     }
 }
@@ -44,7 +44,7 @@ impl Jolts {
     }
 
     pub(crate) fn count_paths(&mut self, current: u32) -> u64 {
-        if let Some(&paths) = self.cache.get(&current) {
+        if let Some(&paths) = self.paths.get(&current) {
             return paths;
         }
 
@@ -62,7 +62,7 @@ impl Jolts {
             }
         };
 
-        self.cache.insert(current, paths);
+        self.paths.insert(current, paths);
 
         paths
     }
