@@ -109,7 +109,9 @@ impl Grid {
         let width = self.width as i64;
         let height = (self.seats.len() as i64) / width;
 
-        let get_neighbours: Box<dyn Fn(i64, i64, &[Option<Seat>]) -> NeighboursVec> = match mode {
+        type Seats<'a> = &'a [Option<Seat>];
+
+        let get_neighbours: Box<dyn Fn(i64, i64, Seats) -> NeighboursVec> = match mode {
             NeighboursMode::Simple => Box::new(|x, y, seats| {
                 let mut neighbours = SmallVec::new();
 
