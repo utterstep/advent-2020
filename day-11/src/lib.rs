@@ -31,13 +31,31 @@ impl Solver for Solution {
 
         match part {
             Part::One => {
-                grid.run_simulation();
+                grid.run_simulation_simple();
 
-                let occupied_seats = grid.seats().filter(|&&seat| matches!(seat, Seat::Occupied)).count();
+                let occupied_seats = grid
+                    .seats()
+                    .filter(|&&seat| matches!(seat, Seat::Occupied))
+                    .count();
 
-                format!("there are {} occupied seats after simulation", occupied_seats)
-            },
-            Part::Two => unimplemented!(),
+                format!(
+                    "there are {} occupied seats after simulation",
+                    occupied_seats
+                )
+            }
+            Part::Two => {
+                grid.run_simulation_complex();
+
+                let occupied_seats = grid
+                    .seats()
+                    .filter(|&&seat| matches!(seat, Seat::Occupied))
+                    .count();
+
+                format!(
+                    "there are {} occupied seats after complex simulation",
+                    occupied_seats
+                )
+            }
         }
     }
 }

@@ -18,3 +18,5 @@ day 09: first invalid number is 22406676
 day 09: encryption weakness is 2942387
 day 10: diff count product is: 2475
 day 10: there are 442136281481216 possible paths
+day 11: there are 2386 occupied seats after simulation
+day 11: there are 2091 occupied seats after complex simulation

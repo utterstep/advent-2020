@@ -24,6 +24,7 @@ pub(crate) enum GridParseError {
 #[derive(Debug, Clone)]
 pub(crate) struct Grid {
     seats: Vec<Option<Seat>>,
+    spare_vec: Vec<Option<Seat>>,
     width: usize,
 }
 
@@ -53,78 +54,160 @@ impl FromStr for Grid {
             })
             .collect::<Result<_, _>>()?;
 
-        Ok(Self { seats: seats.into_iter().flatten().collect(), width: width.ok_or(GridParseError::EmptyGrid)? })
+        let seats = seats.into_iter().flatten().collect::<Vec<_>>();
+        let spare_vec = seats.clone();
+
+        Ok(Self {
+            seats,
+            spare_vec,
+            width: width.ok_or(GridParseError::EmptyGrid)?,
+        })
     }
 }
 
+const GRID_DIRECTIONS: [(i64, i64); 8] = [
+    (-1, -1),
+    (0, -1),
+    (1, -1),
+    (-1, 0),
+    (1, 0),
+    (-1, 1),
+    (0, 1),
+    (1, 1),
+];
+
 impl Grid {
-    fn make_step(&mut self) -> bool {
+    fn make_step_simple(&mut self) -> bool {
         let mut something_changed = false;
 
-        let mut seats = self.seats.clone();
+        let width = self.width as i64;
+        let height = (self.seats.len() as i64) / width;
 
-        for (seat_no, current) in self.seats.iter().enumerate() {
-            let current = match current {
-                None => continue,
-                Some(seat) => seat,
-            };
+        for y in 0..height {
+            for x in 0..width {
+                let seat_no = (x + y * width) as usize;
 
-            let x = seat_no % self.width;
+                let current = match self.seats[seat_no] {
+                    None => continue,
+                    Some(seat) => seat,
+                };
 
-            let indexes = [
-                // HEAD
-                if x == 0 { None } else { seat_no.checked_sub(self.width + 1) },
-                seat_no.checked_sub(self.width),
-                if x == self.width - 1 { None } else { seat_no.checked_sub(self.width - 1) },
-                if x == 0 { None } else { seat_no.checked_sub(1) },
-                // TAIL
-                if x == self.width - 1 { None } else { Some(seat_no + 1) },
-                if x == 0 { None } else { Some(seat_no + self.width - 1) },
-                Some(seat_no + self.width),
-                if x == self.width - 1 { None } else { Some(seat_no + self.width + 1) },
-            ];
+                let mut neighbours = 0;
 
-            let neighbours = indexes
-                .iter()
-                .filter_map(|no| no
-                    .map(|no| self.seats.get(no).map(|&seat| seat))
-                    .flatten()
-                    .flatten()
-                )
-                .filter(|seat| matches!(seat, Seat::Occupied))
-                .count();
+                for (x_diff, y_diff) in GRID_DIRECTIONS.iter() {
+                    let x = x + x_diff;
+                    let y = y + y_diff;
 
-            match current {
-                Seat::Empty => {
-                    if neighbours == 0 {
-                        seats[seat_no].replace(Seat::Occupied);
-
-                        something_changed = true;
+                    if x < 0 || x >= width || y < 0 || y >= height {
+                        continue;
                     }
-                },
-                Seat::Occupied => {
-                    if neighbours >= 4 {
-                        seats[seat_no].replace(Seat::Empty);
 
-                        something_changed = true;
+                    let seat_no = x + y * width;
+
+                    match self.seats[seat_no as usize] {
+                        None => {}
+                        Some(Seat::Occupied) => neighbours += 1,
+                        Some(Seat::Empty) => {}
+                    }
+                }
+
+                match current {
+                    Seat::Empty => {
+                        if neighbours == 0 {
+                            self.spare_vec[seat_no].replace(Seat::Occupied);
+
+                            something_changed = true;
+                        }
+                    }
+                    Seat::Occupied => {
+                        if neighbours >= 4 {
+                            self.spare_vec[seat_no].replace(Seat::Empty);
+
+                            something_changed = true;
+                        }
                     }
                 }
             }
         }
 
-        self.seats = seats;
+        self.seats.clone_from(&self.spare_vec);
 
         something_changed
     }
 
+    fn make_step_complex(&mut self) -> bool {
+        let mut something_changed = false;
+
+        let width = self.width as i64;
+        let height = (self.seats.len() as i64) / width;
+
+        for y in 0..height {
+            for x in 0..width {
+                let seat_no = (x + y * width) as usize;
+
+                let current = match self.seats[seat_no] {
+                    None => continue,
+                    Some(seat) => seat,
+                };
+
+                let mut neighbours = 0;
+
+                for (x_diff, y_diff) in GRID_DIRECTIONS.iter() {
+                    let mut x = x + x_diff;
+                    let mut y = y + y_diff;
+
+                    while !(x < 0 || x >= width || y < 0 || y >= height) {
+                        let seat_no = x + y * width;
+
+                        match self.seats[seat_no as usize] {
+                            None => {
+                                x += x_diff;
+                                y += y_diff;
+
+                                continue;
+                            }
+                            Some(Seat::Occupied) => neighbours += 1,
+                            Some(Seat::Empty) => {}
+                        }
+
+                        break;
+                    }
+                }
+
+                match current {
+                    Seat::Empty => {
+                        if neighbours == 0 {
+                            self.spare_vec[seat_no].replace(Seat::Occupied);
+
+                            something_changed = true;
+                        }
+                    }
+                    Seat::Occupied => {
+                        if neighbours >= 5 {
+                            self.spare_vec[seat_no].replace(Seat::Empty);
+
+                            something_changed = true;
+                        }
+                    }
+                }
+            }
+        }
+
+        self.seats.clone_from(&self.spare_vec);
+
+        something_changed
+    }
+
+    pub(crate) fn run_simulation_complex(&mut self) {
+        while self.make_step_complex() {}
+    }
+
     pub(crate) fn run_simulation_simple(&mut self) {
-        while self.make_step() {}
+        while self.make_step_simple() {}
     }
 
     pub(crate) fn seats(&self) -> impl Iterator<Item = &Seat> {
-        self.seats
-            .iter()
-            .filter_map(|s| s.as_ref())
+        self.seats.iter().filter_map(|s| s.as_ref())
     }
 }
 
@@ -133,11 +216,15 @@ impl fmt::Display for Grid {
         let seats = self
             .seats
             .chunks_exact(self.width)
-            .map(|row| row.iter().map(|seat| match seat {
-                None => '.',
-                Some(Seat::Empty) => 'L',
-                Some(Seat::Occupied) => '#',
-            }).collect::<String>())
+            .map(|row| {
+                row.iter()
+                    .map(|seat| match seat {
+                        None => '.',
+                        Some(Seat::Empty) => 'L',
+                        Some(Seat::Occupied) => '#',
+                    })
+                    .collect::<String>()
+            })
             .collect::<Vec<String>>()
             .join("\n");
 
@@ -152,8 +239,9 @@ mod tests {
     use indoc::indoc;
 
     #[test]
-    fn test_example() {
-        let mut grid: Grid = indoc!("L.LL.LL.LL
+    fn test_simple_example() {
+        let mut grid: Grid = indoc!(
+            "L.LL.LL.LL
             LLLLLLL.LL
             L.L.L..L..
             LLLL.LL.LL
@@ -167,12 +255,40 @@ mod tests {
         .parse()
         .unwrap();
 
-        println!("Before:\n{}\n\n", grid);
+        grid.run_simulation_simple();
 
-        grid.run_simulation();
-
-        let occupied_seats = grid.seats().filter(|&&seat| matches!(seat, Seat::Occupied)).count();
+        let occupied_seats = grid
+            .seats()
+            .filter(|&&seat| matches!(seat, Seat::Occupied))
+            .count();
 
         assert_eq!(occupied_seats, 37);
+    }
+
+    #[test]
+    fn test_complex_example() {
+        let mut grid: Grid = indoc!(
+            "L.LL.LL.LL
+            LLLLLLL.LL
+            L.L.L..L..
+            LLLL.LL.LL
+            L.LL.LL.LL
+            L.LLLLL.LL
+            ..L.L.....
+            LLLLLLLLLL
+            L.LLLLLL.L
+            L.LLLLL.LL"
+        )
+        .parse()
+        .unwrap();
+
+        grid.run_simulation_complex();
+
+        let occupied_seats = grid
+            .seats()
+            .filter(|&&seat| matches!(seat, Seat::Occupied))
+            .count();
+
+        assert_eq!(occupied_seats, 26);
     }
 }
