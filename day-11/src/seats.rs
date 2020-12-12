@@ -3,6 +3,8 @@ use std::{fmt, str::FromStr};
 use displaydoc::Display;
 use thiserror::Error;
 
+use smallvec::SmallVec;
+
 #[derive(Debug, Copy, Clone)]
 pub(crate) enum Seat {
     Occupied,
@@ -25,6 +27,8 @@ pub(crate) enum GridParseError {
 pub(crate) struct Grid {
     seats: Vec<Option<Seat>>,
     new_seats: Vec<Option<Seat>>,
+    neighbours_simple: Vec<Option<SmallVec<[usize; 8]>>>,
+    neighbours_complex: Vec<Option<SmallVec<[usize; 8]>>>,
     width: usize,
 }
 
@@ -61,6 +65,8 @@ impl FromStr for Grid {
             seats,
             new_seats: spare_vec,
             width: width.ok_or(GridParseError::EmptyGrid)?,
+            neighbours_simple: Vec::new(),
+            neighbours_complex: Vec::new(),
         })
     }
 }
@@ -79,100 +85,120 @@ const GRID_DIRECTIONS: [(i64, i64); 8] = [
     (1, 1),
 ];
 
+#[derive(Debug)]
+enum NeighboursMode {
+    Simple,
+    Complex,
+}
+
 impl Grid {
-    fn make_step_simple(&mut self) -> bool {
-        let mut something_changed = false;
+    fn populate_neighbours(&mut self, mode: NeighboursMode) {
+        let neighbours_map = match mode {
+            NeighboursMode::Simple => &mut self.neighbours_simple,
+            NeighboursMode::Complex => &mut self.neighbours_complex,
+        };
 
-        let width = self.width as i64;
-        let height = (self.seats.len() as i64) / width;
-
-        for y in 0..height {
-            for x in 0..width {
-                let seat_no = (x + y * width) as usize;
-
-                let current = match self.seats[seat_no] {
-                    None => continue,
-                    Some(seat) => seat,
-                };
-
-                let mut neighbours = 0;
-
-                for (x_diff, y_diff) in GRID_DIRECTIONS.iter() {
-                    let x = x + x_diff;
-                    let y = y + y_diff;
-
-                    if x < 0 || x >= width || y < 0 || y >= height {
-                        continue;
-                    }
-
-                    let seat_no = x + y * width;
-
-                    match self.seats[seat_no as usize] {
-                        None | Some(Seat::Empty) => {}
-                        Some(Seat::Occupied) => neighbours += 1,
-                    }
-                }
-
-                match current {
-                    Seat::Empty => {
-                        if neighbours == 0 {
-                            self.new_seats[seat_no].replace(Seat::Occupied);
-
-                            something_changed = true;
-                        }
-                    }
-                    Seat::Occupied => {
-                        if neighbours >= 4 {
-                            self.new_seats[seat_no].replace(Seat::Empty);
-
-                            something_changed = true;
-                        }
-                    }
-                }
-            }
+        if neighbours_map.len() == self.seats.len() {
+            return;
         }
 
-        self.seats.copy_from_slice(&self.new_seats);
-
-        something_changed
-    }
-
-    fn make_step_complex(&mut self) -> bool {
-        let mut something_changed = false;
+        neighbours_map.clear();
 
         let width = self.width as i64;
         let height = (self.seats.len() as i64) / width;
 
-        for y in 0..height {
-            for x in 0..width {
-                let seat_no = (x + y * width) as usize;
+        let get_neighbours: Box<dyn Fn(i64, i64, &[Option<Seat>]) -> SmallVec<[usize; 8]>> =
+            match mode {
+                NeighboursMode::Simple => Box::new(|x, y, seats| {
+                    let mut neighbours = SmallVec::new();
 
-                let current = match self.seats[seat_no] {
-                    None => continue,
-                    Some(seat) => seat,
-                };
+                    for (x_diff, y_diff) in GRID_DIRECTIONS.iter() {
+                        let x = x + x_diff;
+                        let y = y + y_diff;
 
-                let mut neighbours = 0;
+                        if x < 0 || x >= width || y < 0 || y >= height {
+                            continue;
+                        }
 
-                for (x_diff, y_diff) in GRID_DIRECTIONS.iter() {
-                    let mut x = x + x_diff;
-                    let mut y = y + y_diff;
+                        let seat_no = (x + y * width) as usize;
 
-                    while !(x < 0 || x >= width || y < 0 || y >= height) {
-                        let seat_no = x + y * width;
+                        if let Some(_) = seats[seat_no] {
+                            neighbours.push(seat_no)
+                        }
+                    }
 
-                        match self.seats[seat_no as usize] {
-                            None => {
+                    neighbours
+                }),
+                NeighboursMode::Complex => Box::new(|x, y, seats| {
+                    let mut neighbours = SmallVec::new();
+
+                    for (x_diff, y_diff) in GRID_DIRECTIONS.iter() {
+                        let mut x = x + x_diff;
+                        let mut y = y + y_diff;
+
+                        while !(x < 0 || x >= width || y < 0 || y >= height) {
+                            let seat_no = (x + y * width) as usize;
+
+                            if let Some(_) = seats[seat_no] {
+                                neighbours.push(seat_no);
+
+                                break;
+                            } else {
                                 x += x_diff;
                                 y += y_diff;
-
-                                continue;
                             }
-                            Some(Seat::Occupied) => neighbours += 1,
-                            Some(Seat::Empty) => {}
                         }
+                    }
 
-                        break;
+                    neighbours
+                }),
+            };
+
+        for y in 0..height {
+            for x in 0..width {
+                let seat_no = (x + y * width) as usize;
+
+                if self.seats[seat_no].is_none() {
+                    neighbours_map.push(None);
+
+                    continue;
+                }
+
+                let neighbours = get_neighbours(x, y, &self.seats);
+
+                neighbours_map.push(Some(neighbours));
+            }
+        }
+    }
+
+    fn make_step(&mut self, mode: NeighboursMode, occupation_limit: usize) -> bool {
+        let neighbours_map = match mode {
+            NeighboursMode::Simple => self.neighbours_simple.as_slice(),
+            NeighboursMode::Complex => self.neighbours_complex.as_slice(),
+        };
+
+        let mut something_changed = false;
+
+        let width = self.width as i64;
+        let height = (self.seats.len() as i64) / width;
+
+        for y in 0..height {
+            for x in 0..width {
+                let seat_no = (x + y * width) as usize;
+
+                let current = match self.seats[seat_no] {
+                    None => continue,
+                    Some(seat) => seat,
+                };
+
+                let mut neighbours = 0;
+
+                if let Some(idxes) = &neighbours_map[seat_no] {
+                    for &idx in idxes {
+                        match self.seats[idx] {
+                            None | Some(Seat::Empty) => {}
+                            Some(Seat::Occupied) => neighbours += 1,
+                        }
                     }
                 }
 
@@ -185,7 +211,7 @@ impl Grid {
                         }
                     }
                     Seat::Occupied => {
-                        if neighbours >= 5 {
+                        if neighbours >= occupation_limit {
                             self.new_seats[seat_no].replace(Seat::Empty);
 
                             something_changed = true;
@@ -198,14 +224,18 @@ impl Grid {
         self.seats.copy_from_slice(&self.new_seats);
 
         something_changed
-    }
-
-    pub(crate) fn run_simulation_complex(&mut self) {
-        while self.make_step_complex() {}
     }
 
     pub(crate) fn run_simulation_simple(&mut self) {
-        while self.make_step_simple() {}
+        self.populate_neighbours(NeighboursMode::Simple);
+
+        while self.make_step(NeighboursMode::Simple, 4) {}
+    }
+
+    pub(crate) fn run_simulation_complex(&mut self) {
+        self.populate_neighbours(NeighboursMode::Complex);
+
+        while self.make_step(NeighboursMode::Complex, 5) {}
     }
 
     pub(crate) fn seats(&self) -> impl Iterator<Item = &Seat> {

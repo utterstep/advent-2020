@@ -19,7 +19,6 @@ physical id : 0
 
 utterstep@utterstep-nix:~/my/advent-2020$ hyperfine --warmup 50 ./target/release/run-all
 Benchmark #1: ./target/release/run-all
-  Time (mean ± σ):      30.7 ms ±   0.1 ms    [User: 30.2 ms, System: 0.4 ms]
-  Range (min … max):    30.5 ms …  31.1 ms    96 runs
-
+  Time (mean ± σ):      22.2 ms ±   0.1 ms    [User: 21.7 ms, System: 0.6 ms]
+  Range (min … max):    22.1 ms …  22.6 ms    132 runs
 ```
