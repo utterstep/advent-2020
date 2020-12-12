@@ -23,12 +23,14 @@ pub(crate) enum GridParseError {
     EmptyGrid,
 }
 
+type NeighboursVec = SmallVec<[usize; 8]>;
+
 #[derive(Debug, Clone)]
 pub(crate) struct Grid {
     seats: Vec<Option<Seat>>,
     new_seats: Vec<Option<Seat>>,
-    neighbours_simple: Vec<Option<SmallVec<[usize; 8]>>>,
-    neighbours_complex: Vec<Option<SmallVec<[usize; 8]>>>,
+    neighbours_simple: Vec<Option<NeighboursVec>>,
+    neighbours_complex: Vec<Option<NeighboursVec>>,
     width: usize,
 }
 
@@ -107,7 +109,7 @@ impl Grid {
         let width = self.width as i64;
         let height = (self.seats.len() as i64) / width;
 
-        let get_neighbours: Box<dyn Fn(i64, i64, &[Option<Seat>]) -> SmallVec<[usize; 8]>> =
+        let get_neighbours: Box<dyn Fn(i64, i64, &[Option<Seat>]) -> NeighboursVec> =
             match mode {
                 NeighboursMode::Simple => Box::new(|x, y, seats| {
                     let mut neighbours = SmallVec::new();
@@ -122,7 +124,7 @@ impl Grid {
 
                         let seat_no = (x + y * width) as usize;
 
-                        if let Some(_) = seats[seat_no] {
+                        if seats[seat_no].is_some() {
                             neighbours.push(seat_no)
                         }
                     }
@@ -139,7 +141,7 @@ impl Grid {
                         while !(x < 0 || x >= width || y < 0 || y >= height) {
                             let seat_no = (x + y * width) as usize;
 
-                            if let Some(_) = seats[seat_no] {
+                            if seats[seat_no].is_some() {
                                 neighbours.push(seat_no);
 
                                 break;
