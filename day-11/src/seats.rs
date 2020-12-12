@@ -24,7 +24,7 @@ pub(crate) enum GridParseError {
 #[derive(Debug, Clone)]
 pub(crate) struct Grid {
     seats: Vec<Option<Seat>>,
-    spare_vec: Vec<Option<Seat>>,
+    new_seats: Vec<Option<Seat>>,
     width: usize,
 }
 
@@ -59,18 +59,21 @@ impl FromStr for Grid {
 
         Ok(Self {
             seats,
-            spare_vec,
+            new_seats: spare_vec,
             width: width.ok_or(GridParseError::EmptyGrid)?,
         })
     }
 }
 
 const GRID_DIRECTIONS: [(i64, i64); 8] = [
+    // TOP
     (-1, -1),
     (0, -1),
     (1, -1),
+    // MIDDLE
     (-1, 0),
     (1, 0),
+    // BOTTOM
     (-1, 1),
     (0, 1),
     (1, 1),
@@ -105,23 +108,22 @@ impl Grid {
                     let seat_no = x + y * width;
 
                     match self.seats[seat_no as usize] {
-                        None => {}
+                        None | Some(Seat::Empty) => {}
                         Some(Seat::Occupied) => neighbours += 1,
-                        Some(Seat::Empty) => {}
                     }
                 }
 
                 match current {
                     Seat::Empty => {
                         if neighbours == 0 {
-                            self.spare_vec[seat_no].replace(Seat::Occupied);
+                            self.new_seats[seat_no].replace(Seat::Occupied);
 
                             something_changed = true;
                         }
                     }
                     Seat::Occupied => {
                         if neighbours >= 4 {
-                            self.spare_vec[seat_no].replace(Seat::Empty);
+                            self.new_seats[seat_no].replace(Seat::Empty);
 
                             something_changed = true;
                         }
@@ -130,7 +132,7 @@ impl Grid {
             }
         }
 
-        self.seats.clone_from(&self.spare_vec);
+        self.seats.copy_from_slice(&self.new_seats);
 
         something_changed
     }
@@ -177,14 +179,14 @@ impl Grid {
                 match current {
                     Seat::Empty => {
                         if neighbours == 0 {
-                            self.spare_vec[seat_no].replace(Seat::Occupied);
+                            self.new_seats[seat_no].replace(Seat::Occupied);
 
                             something_changed = true;
                         }
                     }
                     Seat::Occupied => {
                         if neighbours >= 5 {
-                            self.spare_vec[seat_no].replace(Seat::Empty);
+                            self.new_seats[seat_no].replace(Seat::Empty);
 
                             something_changed = true;
                         }
@@ -193,7 +195,7 @@ impl Grid {
             }
         }
 
-        self.seats.clone_from(&self.spare_vec);
+        self.seats.copy_from_slice(&self.new_seats);
 
         something_changed
     }
