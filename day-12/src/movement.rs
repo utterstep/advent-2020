@@ -27,11 +27,11 @@ pub(crate) enum Movement {
 
 impl Movement {
     pub(super) fn to_pos_diff(&self) -> (i64, i64) {
-        match self {
-            &Self::North(value) => (value, 0),
-            &Self::South(value) => (-value, 0),
-            &Self::East(value) => (0, value),
-            &Self::West(value) => (0, -value),
+        match *self {
+            Self::North(value) => (value, 0),
+            Self::South(value) => (-value, 0),
+            Self::East(value) => (0, value),
+            Self::West(value) => (0, -value),
             _ => (0, 0),
         }
     }
