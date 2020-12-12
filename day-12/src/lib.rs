@@ -6,7 +6,7 @@ mod movement;
 mod ship;
 
 use movement::Movement;
-use ship::{BasicShip, WaypointedShip, Ship};
+use ship::{BasicShip, Ship, WaypointedShip};
 
 #[derive(Debug)]
 pub struct Solution {

@@ -30,13 +30,12 @@ impl Orientation {
     pub(super) fn process_movement(self, movement: &Movement) -> Self {
         match movement {
             Movement::Left(degrees) => {
-                Self::ORDER[(
-                    Self::ORIENTATIONS_COUNT + self.order() - degrees.quarters()
-                ) % Self::ORIENTATIONS_COUNT]
-            },
+                Self::ORDER[(Self::ORIENTATIONS_COUNT + self.order() - degrees.quarters())
+                    % Self::ORIENTATIONS_COUNT]
+            }
             Movement::Right(degrees) => {
                 Self::ORDER[(self.order() + degrees.quarters()) % Self::ORIENTATIONS_COUNT]
-            },
+            }
             _ => self,
         }
     }

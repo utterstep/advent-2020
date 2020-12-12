@@ -91,7 +91,8 @@ mod tests {
 
     #[test]
     fn test_example() {
-        let movements: Vec<Movement> = indoc!("F10
+        let movements: Vec<Movement> = indoc!(
+            "F10
             N3
             F7
             R90

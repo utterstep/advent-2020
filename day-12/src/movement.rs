@@ -61,7 +61,7 @@ impl FromStr for Movement {
             'R' => Ok(Self::Right(Degrees(s[1..].parse()?))),
             'L' => Ok(Self::Left(Degrees(s[1..].parse()?))),
             'F' => Ok(Self::Forward(s[1..].parse()?)),
-            other => Err(ParseMovementError::InvalidAction(other))
+            other => Err(ParseMovementError::InvalidAction(other)),
         }
     }
 }
