@@ -22,3 +22,4 @@ day 11: there are 2386 occupied seats after simulation
 day 11: there are 2091 occupied seats after complex simulation
 day 12: ship distance from zero is: 858
 day 12: ship distance from zero is: 39140
+day 13: you will depart in bus №991 at 1008838. Answer is 5946
