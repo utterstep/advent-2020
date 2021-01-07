@@ -119,6 +119,10 @@ impl Component for App {
                 <h1>
                     {"Advent of Code-2020"}
                 </h1>
+                <h2>
+                    {"Results"}
+                </h2>
+                { solution }
                 <form>
                     <h2>
                         {"Select day and part"}
@@ -153,9 +157,11 @@ impl Component for App {
                         {"Enter input data:"}
                     </h2>
                     <textarea
+                        id="input-data"
                         rows={10}
                         cols={80}
                         value=&self.input_data
+                        spellcheck=false
                         oninput=self.link.callback(|e: InputData| Message::UpdateInputData(e.value))
                     />
                     <section>
@@ -167,10 +173,6 @@ impl Component for App {
                         </button>
                     </section>
                 </form>
-                <h2>
-                    {"Results"}
-                </h2>
-                { solution }
             </main>
         }
     }
