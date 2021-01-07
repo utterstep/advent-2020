@@ -1,0 +1,6 @@
+dist
+node_modules
+pkg
+wasm-pack.log
+.cache
+package-lock.json

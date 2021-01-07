@@ -1,0 +1,14 @@
+{
+  "author": "Vlad Stepanov <8uk.8ak@gmail.com>",
+  "name": "advent-2020-frontend",
+  "version": "0.1.0",
+  "license": "MIT",
+  "scripts": {
+    "start": "parcel static/index.html",
+    "build": "parcel build  static/index.html"
+  },
+  "devDependencies": {
+    "parcel-bundler": "^1.12.4",
+    "parcel-plugin-wasm.rs": "^1.3.0"
+  }
+}

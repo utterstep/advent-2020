@@ -18,6 +18,8 @@ members = [
 
     "integration-test",
     "run-all",
+
+    "frontend",
 ]
 
 [profile.release]

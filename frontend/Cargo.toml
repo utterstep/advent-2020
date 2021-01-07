@@ -1,0 +1,54 @@
+[package]
+authors = ["Vlad Stepanov <8uk.8ak@gmail.com>"]
+categories = ["wasm"]
+description = "Yew frontend for my Advent of Code-2020 solution!"
+license = "MIT"
+name = "advent-2020-frontend"
+readme = "./README.md"
+version = "0.1.0"
+edition = "2018"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+advent-utils = { git = "https://github.com/utter-step/advent-utils" }
+
+day-01 = { path = "../day-01" }
+day-02 = { path = "../day-02" }
+day-03 = { path = "../day-03" }
+day-04 = { path = "../day-04" }
+day-05 = { path = "../day-05" }
+day-06 = { path = "../day-06" }
+day-07 = { path = "../day-07" }
+day-08 = { path = "../day-08" }
+day-09 = { path = "../day-09" }
+day-10 = { path = "../day-10" }
+day-11 = { path = "../day-11" }
+day-12 = { path = "../day-12" }
+day-13 = { path = "../day-13" }
+day-14 = { path = "../day-14" }
+
+enum_dispatch = "0.3"
+
+cfg-if = "1.0"
+wasm-bindgen = "0.2.69"
+
+# The `console_error_panic_hook` crate provides better debugging of panics by
+# logging them with `console.error`. This is great for development, but requires
+# all the `std::fmt` and `std::panicking` infrastructure, so isn't great for
+# code size when deploying.
+console_error_panic_hook = { version = "0.1.6", optional = true }
+
+# `wee_alloc` is a tiny allocator for wasm that is only ~1K in code size
+# compared to the default allocator's ~10K. It is slower than the default
+# allocator, however. Also as of wee_alloc v0.4.2, does not yet work on stable
+# (tested with rust v1.31.1).
+wee_alloc = "0.4"
+
+web-sys = "0.3.46"
+
+yew = "0.17"
+
+[features]
+default = ["console_error_panic_hook"]
