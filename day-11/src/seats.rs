@@ -137,7 +137,7 @@ impl Grid {
                 };
 
                 &simple_finder
-            },
+            }
             NeighboursMode::Complex => {
                 complex_finder = |x, y, seats: Seats| {
                     let mut neighbours = SmallVec::new();
@@ -164,7 +164,7 @@ impl Grid {
                 };
 
                 &complex_finder
-            },
+            }
         };
 
         for y in 0..height {

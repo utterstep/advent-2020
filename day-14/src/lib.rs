@@ -17,7 +17,9 @@ impl TryFrom<PathBuf> for Solution {
     type Error = Box<dyn Error>;
 
     fn try_from(input_file: PathBuf) -> Result<Self, Self::Error> {
-        Ok(Self { commands: parse_file(input_file)? })
+        Ok(Self {
+            commands: parse_file(input_file)?,
+        })
     }
 }
 
@@ -33,9 +35,12 @@ impl Solver for Solution {
             Part::One => {
                 self.commands.iter().for_each(|c| mem.process_command(c));
 
-                format!("sum of values in memory: {}", mem.data().values().sum::<u64>())
-            },
-            Part::Two => unimplemented!()
+                format!(
+                    "sum of values in memory: {}",
+                    mem.data().values().sum::<u64>()
+                )
+            }
+            Part::Two => unimplemented!(),
         }
     }
 }

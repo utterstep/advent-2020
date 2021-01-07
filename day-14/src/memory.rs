@@ -24,11 +24,11 @@ impl Memory {
                 let value = (value & self.and_mask) | self.or_mask;
 
                 self.data.insert(address, value);
-            },
+            }
             &Command::SetMask { and_mask, or_mask } => {
                 self.and_mask = and_mask;
                 self.or_mask = or_mask;
-            },
+            }
         }
     }
 

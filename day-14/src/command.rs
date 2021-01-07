@@ -5,14 +5,8 @@ use thiserror::Error;
 
 #[derive(Debug, Eq, PartialEq)]
 pub(crate) enum Command {
-    SetMask {
-        or_mask: u64,
-        and_mask: u64,
-    },
-    Write {
-        address: usize,
-        value: u64
-    },
+    SetMask { or_mask: u64, and_mask: u64 },
+    Write { address: usize, value: u64 },
 }
 
 #[derive(Debug, Display, Error)]
@@ -38,34 +32,45 @@ impl FromStr for Command {
         let mut operands = s.split(" = ");
 
         if s.starts_with("mask") {
-            let mask = operands.skip(1).next().ok_or(ParseCommandError::InvalidFormat)?;
+            let mask = operands
+                .skip(1)
+                .next()
+                .ok_or(ParseCommandError::InvalidFormat)?;
 
-            let (and_mask, or_mask) = mask
-                .chars()
-                .enumerate()
-                .try_fold((std::u64::MAX, 0), |(and_mask, or_mask), (idx, chr)| {
-                    match chr {
-                        '0' => {
-                            let bit = 1 << BIT_LENGTH.checked_sub(idx).ok_or(ParseCommandError::InvalidMaskLength)?;
+            let (and_mask, or_mask) = mask.chars().enumerate().try_fold(
+                (std::u64::MAX, 0),
+                |(and_mask, or_mask), (idx, chr)| match chr {
+                    '0' => {
+                        let bit = 1
+                            << BIT_LENGTH
+                                .checked_sub(idx)
+                                .ok_or(ParseCommandError::InvalidMaskLength)?;
 
-                            Ok((and_mask ^ bit, or_mask))
-                        },
-                        '1' => {
-                            let bit = 1 << (BIT_LENGTH - idx);
-
-                            Ok((and_mask ^ bit, or_mask ^ bit))
-                        },
-                        'X' => Ok((and_mask, or_mask)),
-                        other => Err(ParseCommandError::UnknownMaskChar(other)),
+                        Ok((and_mask ^ bit, or_mask))
                     }
-                })?;
+                    '1' => {
+                        let bit = 1 << (BIT_LENGTH - idx);
+
+                        Ok((and_mask ^ bit, or_mask ^ bit))
+                    }
+                    'X' => Ok((and_mask, or_mask)),
+                    other => Err(ParseCommandError::UnknownMaskChar(other)),
+                },
+            )?;
 
             Ok(Self::SetMask { and_mask, or_mask })
         } else if s.starts_with("mem") {
             let address_spec = operands.next().ok_or(ParseCommandError::InvalidFormat)?;
-            let value = operands.next().ok_or(ParseCommandError::InvalidFormat)?.parse()?;
+            let value = operands
+                .next()
+                .ok_or(ParseCommandError::InvalidFormat)?
+                .parse()?;
 
-            let address = address_spec.split('[').skip(1).next().ok_or(ParseCommandError::InvalidFormat)?;
+            let address = address_spec
+                .split('[')
+                .skip(1)
+                .next()
+                .ok_or(ParseCommandError::InvalidFormat)?;
             if address.ends_with(']') {
                 let address = address[..address.len() - 1].parse()?;
 
@@ -85,11 +90,16 @@ mod tests {
 
     #[test]
     fn test_command_parse() {
-        let cmd: Command = "mask = XXXXXXXXXXXXXXXXXXXXXXXXXXXXX1XXXX0X".parse().unwrap();
+        let cmd: Command = "mask = XXXXXXXXXXXXXXXXXXXXXXXXXXXXX1XXXX0X"
+            .parse()
+            .unwrap();
 
-        assert_eq!(cmd, Command::SetMask {
-            and_mask: 0b1111111111111111111111111111111111111111111111111111111110111101,
-            or_mask: 64
-        });
+        assert_eq!(
+            cmd,
+            Command::SetMask {
+                and_mask: 0b1111111111111111111111111111111111111111111111111111111110111101,
+                or_mask: 64
+            }
+        );
     }
 }
