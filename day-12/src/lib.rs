@@ -29,9 +29,12 @@ impl Solver for Solution {
     }
 
     fn solve(&self, part: Part) -> String {
-        let mut ship: Box<dyn Ship> = match part {
-            Part::One => Box::new(BasicShip::new()),
-            Part::Two => Box::new(WaypointedShip::new()),
+        let mut basic = BasicShip::new();
+        let mut waypointed = WaypointedShip::new();
+
+        let ship: &mut dyn Ship = match part {
+            Part::One => &mut basic,
+            Part::Two => &mut waypointed,
         };
 
         for movement in &self.movements {

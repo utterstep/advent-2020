@@ -111,50 +111,60 @@ impl Grid {
 
         type Seats<'a> = &'a [Option<Seat>];
 
-        let get_neighbours: Box<dyn Fn(i64, i64, Seats) -> NeighboursVec> = match mode {
-            NeighboursMode::Simple => Box::new(|x, y, seats| {
-                let mut neighbours = SmallVec::new();
+        let (simple_finder, complex_finder);
 
-                for (x_diff, y_diff) in GRID_DIRECTIONS.iter() {
-                    let x = x + x_diff;
-                    let y = y + y_diff;
+        let get_neighbours: &dyn Fn(i64, i64, Seats) -> NeighboursVec = match mode {
+            NeighboursMode::Simple => {
+                simple_finder = |x, y, seats: Seats| {
+                    let mut neighbours = SmallVec::new();
 
-                    if x < 0 || x >= width || y < 0 || y >= height {
-                        continue;
-                    }
+                    for (x_diff, y_diff) in GRID_DIRECTIONS.iter() {
+                        let x = x + x_diff;
+                        let y = y + y_diff;
 
-                    let seat_no = (x + y * width) as usize;
+                        if x < 0 || x >= width || y < 0 || y >= height {
+                            continue;
+                        }
 
-                    if seats[seat_no].is_some() {
-                        neighbours.push(seat_no)
-                    }
-                }
-
-                neighbours
-            }),
-            NeighboursMode::Complex => Box::new(|x, y, seats| {
-                let mut neighbours = SmallVec::new();
-
-                for (x_diff, y_diff) in GRID_DIRECTIONS.iter() {
-                    let mut x = x + x_diff;
-                    let mut y = y + y_diff;
-
-                    while !(x < 0 || x >= width || y < 0 || y >= height) {
                         let seat_no = (x + y * width) as usize;
 
                         if seats[seat_no].is_some() {
-                            neighbours.push(seat_no);
-
-                            break;
-                        } else {
-                            x += x_diff;
-                            y += y_diff;
+                            neighbours.push(seat_no)
                         }
                     }
-                }
 
-                neighbours
-            }),
+                    neighbours
+                };
+
+                &simple_finder
+            },
+            NeighboursMode::Complex => {
+                complex_finder = |x, y, seats: Seats| {
+                    let mut neighbours = SmallVec::new();
+
+                    for (x_diff, y_diff) in GRID_DIRECTIONS.iter() {
+                        let mut x = x + x_diff;
+                        let mut y = y + y_diff;
+
+                        while !(x < 0 || x >= width || y < 0 || y >= height) {
+                            let seat_no = (x + y * width) as usize;
+
+                            if seats[seat_no].is_some() {
+                                neighbours.push(seat_no);
+
+                                break;
+                            } else {
+                                x += x_diff;
+                                y += y_diff;
+                            }
+                        }
+                    }
+
+                    neighbours
+                };
+
+                &complex_finder
+            },
         };
 
         for y in 0..height {
