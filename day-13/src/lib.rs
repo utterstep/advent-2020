@@ -1,6 +1,6 @@
-use std::{convert::TryFrom, error::Error, path::PathBuf};
+use std::{error::Error, str::FromStr};
 
-use advent_utils::{read_file, Part, Solver};
+use advent_utils::{Part, Solver};
 
 #[derive(Debug)]
 pub struct Solution {
@@ -26,12 +26,11 @@ fn closest_bus<'a>(
         .copied()
 }
 
-impl TryFrom<PathBuf> for Solution {
-    type Error = Box<dyn Error>;
+impl FromStr for Solution {
+    type Err = Box<dyn Error>;
 
-    fn try_from(input_file: PathBuf) -> Result<Self, Self::Error> {
-        let data = read_file(input_file)?;
-        let mut lines = data.lines();
+    fn from_str(input_data: &str) -> Result<Self, Self::Err> {
+        let mut lines = input_data.lines();
         let departure_time = lines.next().expect("input is too short").parse()?;
         let timetable = lines
             .next()

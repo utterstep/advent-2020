@@ -1,6 +1,6 @@
-use std::{collections::BTreeSet, convert::TryFrom, error::Error, path::PathBuf};
+use std::{collections::BTreeSet, error::Error, str::FromStr};
 
-use advent_utils::{parse_file, Part, Solver};
+use advent_utils::{parse_raw_data, Part, Solver};
 
 const TARGET_SUM: u32 = 2020;
 
@@ -9,11 +9,11 @@ pub struct Solution {
     expenses: BTreeSet<u32>,
 }
 
-impl TryFrom<PathBuf> for Solution {
-    type Error = Box<dyn Error>;
+impl FromStr for Solution {
+    type Err = Box<dyn Error>;
 
-    fn try_from(input_file: PathBuf) -> Result<Self, Self::Error> {
-        let expenses = parse_file(input_file)?;
+    fn from_str(input_data: &str) -> Result<Self, Self::Err> {
+        let expenses = parse_raw_data(input_data)?;
 
         Ok(Self {
             expenses: expenses.into_iter().collect(),

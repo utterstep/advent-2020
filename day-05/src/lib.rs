@@ -1,6 +1,6 @@
-use std::{convert::TryFrom, error::Error, path::PathBuf};
+use std::{error::Error, str::FromStr};
 
-use advent_utils::{parse_file, Part, Solver};
+use advent_utils::{parse_raw_data, Part, Solver};
 
 mod boarding_pass;
 
@@ -11,11 +11,11 @@ pub struct Solution {
     passes: Vec<BoardingPass>,
 }
 
-impl TryFrom<PathBuf> for Solution {
-    type Error = Box<dyn Error>;
+impl FromStr for Solution {
+    type Err = Box<dyn Error>;
 
-    fn try_from(path: PathBuf) -> Result<Self, Self::Error> {
-        let passes = parse_file(path)?;
+    fn from_str(input_data: &str) -> Result<Self, Self::Err> {
+        let passes = parse_raw_data(input_data)?;
 
         Ok(Self { passes })
     }

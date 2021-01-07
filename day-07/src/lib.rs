@@ -1,6 +1,6 @@
-use std::{convert::TryFrom, error::Error, path::PathBuf};
+use std::{convert::TryFrom, error::Error, str::FromStr};
 
-use advent_utils::{read_file, Part, Solver};
+use advent_utils::{Part, Solver};
 
 mod bags;
 
@@ -13,12 +13,12 @@ pub struct Solution {
     raw_data: String,
 }
 
-impl TryFrom<PathBuf> for Solution {
-    type Error = Box<dyn Error>;
+impl<'a> FromStr for Solution {
+    type Err = Box<dyn Error>;
 
-    fn try_from(input_file: PathBuf) -> Result<Self, Self::Error> {
+    fn from_str(input_data: &str) -> Result<Self, Self::Err> {
         Ok(Self {
-            raw_data: read_file(input_file)?,
+            raw_data: input_data.to_owned(),
         })
     }
 }

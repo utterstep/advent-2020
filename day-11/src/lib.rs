@@ -1,6 +1,6 @@
-use std::{convert::TryFrom, error::Error, path::PathBuf};
+use std::{error::Error, str::FromStr};
 
-use advent_utils::{read_file, Part, Solver};
+use advent_utils::{Part, Solver};
 
 mod seats;
 
@@ -11,11 +11,11 @@ pub struct Solution {
     grid: Grid,
 }
 
-impl TryFrom<PathBuf> for Solution {
-    type Error = Box<dyn Error>;
+impl FromStr for Solution {
+    type Err = Box<dyn Error>;
 
-    fn try_from(input_file: PathBuf) -> Result<Self, Self::Error> {
-        let grid = read_file(input_file)?.parse()?;
+    fn from_str(input_data: &str) -> Result<Self, Self::Err> {
+        let grid = input_data.parse()?;
 
         Ok(Self { grid })
     }

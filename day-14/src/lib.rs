@@ -1,6 +1,6 @@
-use std::{convert::TryFrom, error::Error, path::PathBuf};
+use std::{error::Error, str::FromStr};
 
-use advent_utils::{parse_file, Part, Solver};
+use advent_utils::{parse_raw_data, Part, Solver};
 
 mod command;
 mod memory;
@@ -13,12 +13,12 @@ pub struct Solution {
     commands: Vec<Command>,
 }
 
-impl TryFrom<PathBuf> for Solution {
-    type Error = Box<dyn Error>;
+impl FromStr for Solution {
+    type Err = Box<dyn Error>;
 
-    fn try_from(input_file: PathBuf) -> Result<Self, Self::Error> {
+    fn from_str(input_data: &str) -> Result<Self, Self::Err> {
         Ok(Self {
-            commands: parse_file(input_file)?,
+            commands: parse_raw_data(input_data)?,
         })
     }
 }

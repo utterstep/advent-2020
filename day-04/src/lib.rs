@@ -1,6 +1,6 @@
-use std::{convert::TryFrom, error::Error, path::PathBuf};
+use std::{error::Error, str::FromStr};
 
-use advent_utils::{read_file, Part, Solver};
+use advent_utils::{Part, Solver};
 
 mod passport;
 
@@ -11,11 +11,11 @@ pub struct Solution {
     passports_raw: String,
 }
 
-impl TryFrom<PathBuf> for Solution {
-    type Error = Box<dyn Error>;
+impl FromStr for Solution {
+    type Err = Box<dyn Error>;
 
-    fn try_from(input_file: PathBuf) -> Result<Self, Self::Error> {
-        let passports_raw = read_file(input_file)?;
+    fn from_str(input_data: &str) -> Result<Self, Self::Err> {
+        let passports_raw = input_data.to_owned();
 
         Ok(Self { passports_raw })
     }
