@@ -35,34 +35,34 @@ impl<'a> Passport<'a> {
     fn _is_valid(&self) -> Option<bool> {
         let byr = self.0.get("byr")?.parse::<u32>().ok()?;
 
-        if !(byr >= 1920 && byr <= 2002) {
+        if !(1920..=2002).contains(&byr) {
             return Some(false);
         }
 
         let iyr = self.0.get("iyr")?.parse::<u32>().ok()?;
 
-        if !(iyr >= 2010 && iyr <= 2020) {
+        if !(2010..=2020).contains(&iyr) {
             return Some(false);
         }
 
         let eyr = self.0.get("eyr")?.parse::<u32>().ok()?;
 
-        if !(eyr >= 2010 && eyr <= 2030) {
+        if !(2010..=2030).contains(&eyr) {
             return Some(false);
         }
 
         let hgt = self.0.get("hgt")?;
 
-        if hgt.ends_with("cm") {
-            let hgt = hgt.split_at(hgt.len() - 2).0.parse::<u32>().ok()?;
+        if let Some(hgt) = hgt.strip_suffix("cm") {
+            let hgt = hgt.parse::<u32>().ok()?;
 
-            if !(hgt >= 150 && hgt <= 193) {
+            if !(150..=193).contains(&hgt) {
                 return Some(false);
             }
-        } else if hgt.ends_with("in") {
-            let hgt = hgt.split_at(hgt.len() - 2).0.parse::<u32>().ok()?;
+        } else if let Some(hgt) = hgt.strip_suffix("in") {
+            let hgt = hgt.parse::<u32>().ok()?;
 
-            if !(hgt >= 59 && hgt <= 76) {
+            if !(59..=76).contains(&hgt) {
                 return Some(false);
             }
         } else {
@@ -70,16 +70,13 @@ impl<'a> Passport<'a> {
         }
 
         let hcl = self.0.get("hcl")?;
+        let hcl = hcl.strip_prefix('#')?;
 
-        if !hcl.starts_with('#') {
+        if hcl.len() != 6 {
             return Some(false);
         }
 
-        if hcl[1..].len() != 6 {
-            return Some(false);
-        }
-
-        u32::from_str_radix(hcl[1..].as_ref(), 16).ok()?;
+        u32::from_str_radix(hcl, 16).ok()?;
 
         let ecl = self.0.get("ecl")?;
 

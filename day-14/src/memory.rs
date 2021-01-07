@@ -19,13 +19,13 @@ impl Memory {
     }
 
     pub(crate) fn process_command(&mut self, command: &Command) {
-        match command {
-            &Command::Write { address, value } => {
+        match *command {
+            Command::Write { address, value } => {
                 let value = (value & self.and_mask) | self.or_mask;
 
                 self.data.insert(address, value);
             }
-            &Command::SetMask { and_mask, or_mask } => {
+            Command::SetMask { and_mask, or_mask } => {
                 self.and_mask = and_mask;
                 self.or_mask = or_mask;
             }

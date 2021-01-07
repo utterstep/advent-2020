@@ -33,8 +33,7 @@ impl FromStr for Command {
 
         if s.starts_with("mask") {
             let mask = operands
-                .skip(1)
-                .next()
+                .nth(1)
                 .ok_or(ParseCommandError::InvalidFormat)?;
 
             let (and_mask, or_mask) = mask.chars().enumerate().try_fold(
@@ -68,11 +67,10 @@ impl FromStr for Command {
 
             let address = address_spec
                 .split('[')
-                .skip(1)
-                .next()
+                .nth(1)
                 .ok_or(ParseCommandError::InvalidFormat)?;
-            if address.ends_with(']') {
-                let address = address[..address.len() - 1].parse()?;
+            if let Some(address) = address.strip_suffix(']') {
+                let address = address.parse()?;
 
                 Ok(Self::Write { address, value })
             } else {
