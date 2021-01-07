@@ -32,9 +32,7 @@ impl FromStr for Command {
         let mut operands = s.split(" = ");
 
         if s.starts_with("mask") {
-            let mask = operands
-                .nth(1)
-                .ok_or(ParseCommandError::InvalidFormat)?;
+            let mask = operands.nth(1).ok_or(ParseCommandError::InvalidFormat)?;
 
             let (and_mask, or_mask) = mask.chars().enumerate().try_fold(
                 (std::u64::MAX, 0),
