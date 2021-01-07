@@ -12,10 +12,10 @@ npm install
 npm run build
 cp -r dist $DIR
 cd $DIR
-rm -rf -- !(dist)
+ls | grep -Pv "(dist|target)" | xargs rm -rf
 mv dist/* .
 rm -rf dist
 
-git add . && git commit "[pages] update"
+git add . && git commit -m "[pages] update"
 git push origin gh-pages --force
 git checkout main
