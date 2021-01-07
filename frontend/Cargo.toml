@@ -44,7 +44,7 @@ console_error_panic_hook = { version = "0.1.6", optional = true }
 # compared to the default allocator's ~10K. It is slower than the default
 # allocator, however. Also as of wee_alloc v0.4.2, does not yet work on stable
 # (tested with rust v1.31.1).
-wee_alloc = "0.4"
+# wee_alloc = "0.4"
 
 web-sys = "0.3.46"
 
