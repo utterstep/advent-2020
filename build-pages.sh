@@ -15,6 +15,7 @@ cd $DIR
 ls | grep -Pv "(dist|target)" | xargs rm -rf
 mv dist/* .
 rm -rf dist
+echo 'advent-2020.utterstep.app' > CNAME
 
 git add . && git commit -m "[pages] update"
 git push origin gh-pages --force

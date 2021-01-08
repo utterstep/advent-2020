@@ -5,7 +5,7 @@
   "license": "MIT",
   "scripts": {
     "start": "parcel static/index.html",
-    "build": "parcel build static/index.html --public-url /advent-2020"
+    "build": "parcel build static/index.html"
   },
   "devDependencies": {
     "parcel-bundler": "^1.12.4",
