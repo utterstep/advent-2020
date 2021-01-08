@@ -5,7 +5,7 @@ use yew::{
     macros::html, ChangeData, Component, ComponentLink, Html, InputData, MouseEvent, ShouldRender,
 };
 
-use crate::solution::Day;
+use crate::days::Day;
 
 #[derive(Debug)]
 pub(crate) struct App {
@@ -137,20 +137,9 @@ impl Component for App {
                         })
                         value={self.day.day_number() - 1}
                     >
-                        <option value={0}>{ Day::DAYS[0] }</option>
-                        <option value={1}>{ Day::DAYS[1] }</option>
-                        <option value={2}>{ Day::DAYS[2] }</option>
-                        <option value={3}>{ Day::DAYS[3] }</option>
-                        <option value={4}>{ Day::DAYS[4] }</option>
-                        <option value={5}>{ Day::DAYS[5] }</option>
-                        <option value={6}>{ Day::DAYS[6] }</option>
-                        <option value={7}>{ Day::DAYS[7] }</option>
-                        <option value={8}>{ Day::DAYS[8] }</option>
-                        <option value={9}>{ Day::DAYS[9] }</option>
-                        <option value={10}>{ Day::DAYS[10] }</option>
-                        <option value={11}>{ Day::DAYS[11] }</option>
-                        <option value={12}>{ Day::DAYS[12] }</option>
-                        <option value={13}>{ Day::DAYS[13] }</option>
+                        { for Day::DAYS.iter().map(|day| html! {
+                            <option value={*day as usize}>{ day }</option>
+                        })}
                     </select>
                     { for parts }
                     <h2>
