@@ -1,12 +1,16 @@
 use std::str::FromStr;
 
+use displaydoc::Display;
+use thiserror::Error;
+
 #[derive(Debug)]
 pub(crate) struct BoardingPass {
     row: u32,
     seat: u32,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Display, Error)]
+/// Unknown boarding pass format
 pub(crate) struct UnknownFormatError;
 
 impl FromStr for BoardingPass {

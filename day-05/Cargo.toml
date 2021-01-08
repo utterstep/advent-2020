@@ -8,3 +8,6 @@ edition = "2018"
 
 [dependencies]
 advent-utils = { git = "https://github.com/utter-step/advent-utils" }
+
+displaydoc = "0.1"
+thiserror = "1"
