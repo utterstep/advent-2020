@@ -43,4 +43,8 @@ impl Solver for Solution {
             Part::Two => unimplemented!(),
         }
     }
+
+    fn implemented_parts() -> Vec<Part> {
+        vec![Part::One]
+    }
 }
