@@ -71,12 +71,14 @@ impl Solver for Solution {
 
                     vm.reset();
 
-                    let idx = instructions_to_flip
-                        .next()
-                        .expect("unable to make required change");
-                    flip_operation(&mut vm, idx);
+                    match instructions_to_flip.next() {
+                        Some(idx) => {
+                            flip_operation(&mut vm, idx);
 
-                    previous_change.replace(idx);
+                            previous_change.replace(idx);
+                        }
+                        None => return "unable to make required change".to_owned(),
+                    }
                 }
 
                 format!("vm halted with accumulator state {}", vm.accumulator())

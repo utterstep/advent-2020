@@ -48,18 +48,20 @@ impl Solver for Solution {
     fn solve(&self, part: Part) -> String {
         match part {
             Part::One => {
-                let product = find_two_sum(&self.expenses, TARGET_SUM)
-                    .map(|(a, b)| a * b)
-                    .expect("Part One: Solution unknown");
+                let product = find_two_sum(&self.expenses, TARGET_SUM).map(|(a, b)| a * b);
 
-                format!("target two-sum product is {}", product)
+                match product {
+                    Some(product) => format!("target two-sum product is {}", product),
+                    None => "couldn't find solution".to_owned(),
+                }
             }
             Part::Two => {
-                let product = find_three_sum(&self.expenses, TARGET_SUM)
-                    .map(|(a, b, c)| a * b * c)
-                    .expect("Part Two: Solution unknown");
+                let product = find_three_sum(&self.expenses, TARGET_SUM).map(|(a, b, c)| a * b * c);
 
-                format!("target three-sum product is {}", product)
+                match product {
+                    Some(product) => format!("target three-sum product is {}", product),
+                    None => "couldn't find solution".to_owned(),
+                }
             }
         }
     }

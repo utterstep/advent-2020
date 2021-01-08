@@ -12,7 +12,7 @@ pub(crate) struct Jolts {
 impl From<Vec<u32>> for Jolts {
     fn from(jolts: Vec<u32>) -> Self {
         let mut jolts: BTreeSet<u32> = jolts.iter().cloned().collect();
-        let max = jolts.iter().next_back().expect("empty bag") + 3;
+        let max = jolts.iter().next_back().unwrap_or(&0) + 3;
 
         jolts.insert(max);
 

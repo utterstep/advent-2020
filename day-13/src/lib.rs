@@ -1,6 +1,8 @@
-use std::{error::Error, str::FromStr};
+use std::{error::Error, num::ParseIntError, str::FromStr};
 
 use advent_utils::{Part, Solver};
+use displaydoc::Display;
+use thiserror::Error;
 
 #[derive(Debug)]
 pub struct Solution {
@@ -26,15 +28,29 @@ fn closest_bus<'a>(
         .copied()
 }
 
+#[derive(Debug, Display, Error)]
+/// Error while parsing input data
+pub enum TimetableParseError {
+    /// Departure time not specified
+    NoDepartureTime,
+    /// Timetable not specified
+    NoTimetable,
+    /// Error while partsing departure time: {0}
+    DepartureTimeInvalid(#[from] ParseIntError),
+}
+
 impl FromStr for Solution {
     type Err = Box<dyn Error>;
 
     fn from_str(input_data: &str) -> Result<Self, Self::Err> {
         let mut lines = input_data.lines();
-        let departure_time = lines.next().expect("input is too short").parse()?;
+        let departure_time = lines
+            .next()
+            .ok_or(TimetableParseError::NoDepartureTime)?
+            .parse()?;
         let timetable = lines
             .next()
-            .expect("")
+            .ok_or(TimetableParseError::NoTimetable)?
             .split(',')
             .map(|data| data.parse::<u64>().ok())
             .collect();
@@ -57,8 +73,12 @@ impl Solver for Solution {
                 let min_id = closest_bus(
                     self.min_departure_time,
                     self.timetable.iter().filter_map(|id| id.as_ref()),
-                )
-                .expect("no buses :(");
+                );
+
+                let min_id = match min_id {
+                    Some(id) => id,
+                    None => return "no suitable buses :(".to_owned(),
+                };
 
                 let div = self.min_departure_time / min_id;
                 let rem = self.min_departure_time % min_id;

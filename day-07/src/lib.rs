@@ -29,12 +29,16 @@ impl Solver for Solution {
     }
 
     fn solve(&self, part: Part) -> String {
-        let graph: RestrictionsGraph<'_> = self
+        let restrictions = self
             .raw_data
             .lines()
             .map(BagsRestriction::try_from)
-            .map(Result::unwrap)
-            .collect();
+            .collect::<Result<Vec<_>, _>>();
+
+        let graph: RestrictionsGraph<'_> = match restrictions {
+            Ok(restrictions) => restrictions.into_iter().collect(),
+            Err(e) => return format!("error while parsing restrictions: {}", e),
+        };
 
         match part {
             Part::One => format!(

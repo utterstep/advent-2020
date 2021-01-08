@@ -28,19 +28,14 @@ impl Solver for Solution {
 
     fn solve(&self, part: Part) -> String {
         match part {
-            Part::One => format!(
-                "first invalid number is {}",
-                self.xmas
-                    .find_invalid_number(25)
-                    .expect("no invalid numbers!")
-                    .0,
-            ),
-            Part::Two => format!(
-                "encryption weakness is {}",
-                self.xmas
-                    .find_encryption_weakness(25)
-                    .expect("no weaknesses!")
-            ),
+            Part::One => match self.xmas.find_invalid_number(25) {
+                Some((number, _idx)) => format!("first invalid number is {}", number),
+                None => "no invalid numbers".to_owned(),
+            },
+            Part::Two => match self.xmas.find_encryption_weakness(25) {
+                Some(weakness) => format!("encryption weakness is {}", weakness),
+                None => "no weaknesses!".to_owned(),
+            },
         }
     }
 }

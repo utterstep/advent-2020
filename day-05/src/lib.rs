@@ -31,18 +31,26 @@ impl Solver for Solution {
 
         match part {
             Part::One => {
-                let max_id = *ids.iter().max().expect("no passes provided");
+                let max_id = ids.iter().max();
 
-                format!("max ID is {}", max_id)
+                match max_id {
+                    Some(max_id) => format!("max ID is {}", max_id),
+                    None => "no passes provided".to_owned(),
+                }
             }
             Part::Two => {
-                let max_id = *ids.iter().max().expect("no passes provided");
-                let min_id = *ids.iter().min().expect("no passes provided");
+                let max_id = ids.iter().max();
+                let min_id = ids.iter().min();
 
-                let expected_sum = sum_up_to_n(max_id) - sum_up_to_n(min_id - 1);
-                let real_sum = ids.iter().sum::<u32>();
+                match max_id.zip(min_id) {
+                    Some((&max_id, &min_id)) => {
+                        let expected_sum = sum_up_to_n(max_id) - sum_up_to_n(min_id - 1);
+                        let real_sum = ids.iter().sum::<u32>();
 
-                format!("missing pass ID is {}", expected_sum - real_sum)
+                        format!("missing pass ID is {}", expected_sum - real_sum)
+                    }
+                    None => "no passes provided".to_owned(),
+                }
             }
         }
     }
