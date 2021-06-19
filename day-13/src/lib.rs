@@ -4,6 +4,8 @@ use advent_utils::{Part, Solver};
 use displaydoc::Display;
 use thiserror::Error;
 
+mod expr;
+
 #[derive(Debug)]
 pub struct Solution {
     min_departure_time: u64,
