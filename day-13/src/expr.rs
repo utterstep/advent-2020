@@ -1,3 +1,4 @@
+#[allow(dead_code)]
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub(crate) enum Expression {
     Var,
@@ -7,14 +8,14 @@ pub(crate) enum Expression {
 }
 
 impl Expression {
+    #[allow(dead_code)]
     pub fn reduce(&self) -> Self {
         macro_rules! partition_consts {
             ($e: expr) => {
-                $e
-                    .iter()
+                $e.iter()
                     .map(Self::reduce)
                     .partition(|e| matches!(e, Self::Const(_)))
-            }
+            };
         }
 
         match self {
@@ -25,19 +26,21 @@ impl Expression {
 
                 let const_part: i64 = consts
                     .into_iter()
-                    .map(|e| if let Self::Const(c) = e {
-                        c
-                    } else {
-                        unreachable!()
+                    .map(|e| {
+                        if let Self::Const(c) = e {
+                            c
+                        } else {
+                            unreachable!()
+                        }
                     })
                     .sum();
-                
+
                 if others.is_empty() {
                     return Self::Const(const_part);
                 }
 
                 let mut others = others;
-                
+
                 if const_part != 0 {
                     others.push(Self::Const(const_part));
                 }
@@ -47,25 +50,27 @@ impl Expression {
                 } else {
                     Self::Add(others)
                 }
-            },
+            }
             Self::Mul(exprs) => {
                 let (consts, others): (Vec<_>, Vec<_>) = partition_consts!(exprs);
 
                 let const_part: i64 = consts
                     .into_iter()
-                    .map(|e| if let Self::Const(c) = e {
-                        c
-                    } else {
-                        unreachable!()
+                    .map(|e| {
+                        if let Self::Const(c) = e {
+                            c
+                        } else {
+                            unreachable!()
+                        }
                     })
                     .product();
-                
+
                 if others.is_empty() {
                     return Self::Const(const_part);
                 }
 
                 let mut others = others;
-                
+
                 if const_part != 1 {
                     others.push(Self::Const(const_part));
                 }
@@ -86,13 +91,13 @@ mod tests {
 
     #[test]
     fn test_reduce() {
-        assert_eq!(Expression::Add(vec![]).reduce(), Expression::Const(0).reduce());
+        assert_eq!(
+            Expression::Add(vec![]).reduce(),
+            Expression::Const(0).reduce()
+        );
 
         assert_eq!(
-            Expression::Add(vec![
-                Expression::Const(5),
-                Expression::Const(7),
-            ]).reduce(),
+            Expression::Add(vec![Expression::Const(5), Expression::Const(7),]).reduce(),
             Expression::Const(12).reduce()
         );
 
@@ -100,7 +105,8 @@ mod tests {
             Expression::Mul(vec![
                 Expression::Add(vec![Expression::Const(5)]),
                 Expression::Add(vec![]),
-            ]).reduce(),
+            ])
+            .reduce(),
             Expression::Const(0).reduce(),
         );
 
@@ -109,11 +115,9 @@ mod tests {
                 Expression::Const(5),
                 Expression::Var,
                 Expression::Add(vec![Expression::Const(2), Expression::Const(3)])
-            ]).reduce(),
-            Expression::Mul(vec![
-                Expression::Const(25),
-                Expression::Var,
-            ]).reduce(),
+            ])
+            .reduce(),
+            Expression::Mul(vec![Expression::Const(25), Expression::Var,]).reduce(),
         );
     }
 }
