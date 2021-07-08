@@ -68,6 +68,24 @@ impl Solver for Solution {
     }
 
     fn solve(&self, part: Part) -> String {
+        // print linear system for part two
+        let mut ids = self.timetable.iter().enumerate().filter_map(|(i, id)| id.zip(Some(i)));
+        let first = ids.next().unwrap().0;
+
+        let mut var = 'a';
+
+        ids.for_each(|(id, idx)| {
+            var = std::char::from_u32(var as u32 + 1).unwrap_or(var);
+
+            println!(
+                "{first}a + {idx} = {current}{var};",
+                first = first,
+                idx = idx,
+                current = id,
+                var = var,
+            )
+        });
+
         match part {
             Part::One => {
                 let min_id = closest_bus(
