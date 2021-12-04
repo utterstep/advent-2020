@@ -81,11 +81,11 @@ impl Component for App {
                             checked={self.current_part == part}
                             type="radio"
                             name="part"
-                            value={idx}
-                            id={&id}
-                            onchange=self.link.callback(move |e| Message::ChoosePart(part))
+                            value={idx.to_string()}
+                            id={id.to_string()}
+                            onchange=self.link.callback(move |_e| Message::ChoosePart(part))
                         />
-                        <label for={&id}>{format!("Part {:?}", part)}</label>
+                        <label for={id.to_string()}>{format!("Part {:?}", part)}</label>
                     </section>
                 }
             });
@@ -135,10 +135,10 @@ impl Component for App {
                                 unreachable!()
                             }
                         })
-                        value={self.day.day_number() - 1}
+                        value={(self.day.day_number() - 1).to_string()}
                     >
                         { for Day::DAYS.iter().map(|day| html! {
-                            <option value={*day as usize}>{ day }</option>
+                            <option value={(*day as usize).to_string()}>{ day }</option>
                         })}
                     </select>
                     { for parts }
@@ -147,10 +147,10 @@ impl Component for App {
                     </h2>
                     <textarea
                         id="input-data"
-                        rows={10}
-                        cols={80}
-                        value=&self.input_data
-                        spellcheck=false
+                        rows="10"
+                        cols="80"
+                        value={self.input_data.to_owned()}
+                        spellcheck="false"
                         oninput=self.link.callback(|e: InputData| Message::UpdateInputData(e.value))
                     />
                     <section>

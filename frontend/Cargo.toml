@@ -6,7 +6,7 @@ license = "MIT"
 name = "advent-2020-frontend"
 readme = "./README.md"
 version = "0.1.0"
-edition = "2018"
+edition = "2021"
 
 [lib]
 crate-type = ["cdylib"]
@@ -50,7 +50,7 @@ console_error_panic_hook = { version = "0.1.6", optional = true }
 
 web-sys = "0.3.46"
 
-yew = "0.17"
+yew = "0.18"
 
 [features]
 default = ["console_error_panic_hook"]
